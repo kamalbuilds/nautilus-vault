@@ -1,0 +1,13 @@
+[package]
+name = "walrus_security_suite"
+version = "1.0.0"
+license = "MIT"
+authors = ["Walrus Security Team"]
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
+
+[addresses]
+walrus_security = "0x0"
+
+[dev-dependencies]
