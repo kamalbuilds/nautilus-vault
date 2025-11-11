@@ -389,7 +389,8 @@ export class PrivacyEngine {
     return this.dataMinimizer.minimizeData(data, {
       purpose: context.purpose,
       retention: context.retentionPeriod,
-      necessity: 'MINIMAL'
+      necessity: 'MINIMAL',
+      dataTypes: ['personal', 'behavioral']
     });
   }
 
@@ -403,11 +404,19 @@ export class PrivacyEngine {
       return data;
     }
 
-    return this.anonymizationEngine.anonymize(data, {
-      technique: 'K_ANONYMITY',
-      k: 5,
-      suppressionThreshold: 0.1,
-      generalization: true
+    return this.anonymizationEngine.anonymizeData(data, {
+      techniques: [{
+        field: 'personal',
+        method: 'GENERALIZATION',
+        parameters: { levels: 2 }
+      }],
+      kAnonymity: 5,
+      lDiversity: 2,
+      tCloseness: 0.2,
+      differentialPrivacy: {
+        epsilon: 1.0,
+        delta: 1e-5
+      }
     });
   }
 

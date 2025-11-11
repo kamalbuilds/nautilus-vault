@@ -97,6 +97,32 @@ export interface ConsentStatusDetail {
   conditions: string[];
 }
 
+interface ConsentSummary {
+  totalConsents: number;
+  grantedConsents: number;
+  expiredConsents: number;
+  lastActivity: Date;
+}
+
+interface ConsentPurposeInfo {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  granted: boolean;
+  grantedAt: Date;
+  expiresAt?: Date;
+  dataTypes: string[];
+  thirdParties: ThirdPartyProcessor[];
+}
+
+interface ConsentHistoryItem {
+  timestamp: Date;
+  action: string;
+  purposeId?: string;
+  details: string;
+}
+
 export class ConsentManager {
   private consentRequests: Map<string, ConsentRequest> = new Map();
   private consentResponses: Map<string, ConsentResponse> = new Map();
@@ -526,33 +552,7 @@ export class ConsentManager {
     }
   }
 
-  // Private helper methods and interfaces
-
-  private interface ConsentSummary {
-    totalConsents: number;
-    grantedConsents: number;
-    expiredConsents: number;
-    lastActivity: Date;
-  }
-
-  private interface ConsentPurposeInfo {
-    id: string;
-    name: string;
-    description: string;
-    category: string;
-    granted: boolean;
-    grantedAt: Date;
-    expiresAt?: Date;
-    dataTypes: string[];
-    thirdParties: ThirdPartyProcessor[];
-  }
-
-  private interface ConsentHistoryItem {
-    timestamp: Date;
-    action: string;
-    purposeId?: string;
-    details: string;
-  }
+  // Private helper methods
 
   private initializeDefaultPurposes(): void {
     // Essential/Functional purposes
