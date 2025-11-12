@@ -425,38 +425,64 @@ export class FraudDetector {
       confidence: 0
     };
 
-    let totalWeight = 0;
+    if (indicators.length === 0) {
+      return { overall: 0, behavioral: 0, transactional: 0, temporal: 0, network: 0, confidence: 0 };
+    }
+
+    let totalWeightedScore = 0;
+    let maxSingleScore = 0;
     let totalConfidence = 0;
+    let criticalCount = 0;
+    let highCount = 0;
 
     indicators.forEach(indicator => {
       const weight = this.getSeverityWeight(indicator.severity);
-      const score = indicator.confidence * weight;
+      const weightedScore = indicator.confidence * (weight / 10); // Normalize weight to 0-1
+      const categoryScore = Math.min(weightedScore, 1.0);
 
-      totalWeight += weight;
+      totalWeightedScore += weightedScore;
+      maxSingleScore = Math.max(maxSingleScore, weightedScore);
       totalConfidence += indicator.confidence;
 
-      // Categorize indicators
-      if (indicator.description.includes('behavioral') || indicator.description.includes('access')) {
-        scores.behavioral = Math.max(scores.behavioral, score);
-      } else if (indicator.description.includes('transaction') || indicator.description.includes('amount')) {
-        scores.transactional = Math.max(scores.transactional, score);
-      } else if (indicator.description.includes('time') || indicator.description.includes('travel')) {
-        scores.temporal = Math.max(scores.temporal, score);
-      } else if (indicator.description.includes('network') || indicator.description.includes('IP')) {
-        scores.network = Math.max(scores.network, score);
+      // Count severity levels
+      if (indicator.severity === 'CRITICAL') criticalCount++;
+      if (indicator.severity === 'HIGH') highCount++;
+
+      // Categorize indicators with enhanced scoring
+      if (indicator.description.includes('behavioral') || indicator.description.includes('access') || indicator.description.includes('pattern')) {
+        scores.behavioral = Math.max(scores.behavioral, categoryScore);
+      } else if (indicator.description.includes('transaction') || indicator.description.includes('amount') || indicator.description.includes('velocity')) {
+        scores.transactional = Math.max(scores.transactional, categoryScore);
+      } else if (indicator.description.includes('time') || indicator.description.includes('travel') || indicator.description.includes('temporal')) {
+        scores.temporal = Math.max(scores.temporal, categoryScore);
+      } else if (indicator.description.includes('network') || indicator.description.includes('IP') || indicator.description.includes('location') || indicator.description.includes('proxy') || indicator.description.includes('Tor')) {
+        scores.network = Math.max(scores.network, categoryScore);
       }
     });
 
-    const overall = indicators.length > 0 ? totalWeight / indicators.length / 10 : 0;
-    const confidence = indicators.length > 0 ? totalConfidence / indicators.length : 0;
+    // Enhanced overall score calculation
+    const averageScore = totalWeightedScore / indicators.length;
+
+    // Apply severity bonuses
+    let severityBonus = 0;
+    if (criticalCount > 0) severityBonus += 0.3;
+    if (highCount > 0) severityBonus += 0.15;
+    if (criticalCount >= 2) severityBonus += 0.2; // Multiple critical indicators
+
+    // Combine average, max, and severity bonus
+    const combinedScore = Math.min(averageScore + severityBonus, 1.0);
+
+    // Ensure minimum risk for suspicious patterns
+    const overall = Math.max(combinedScore, maxSingleScore * 0.8);
+    const confidence = totalConfidence / indicators.length;
 
     return {
-      overall: Math.min(overall, 1),
-      behavioral: Math.min(scores.behavioral, 1),
-      transactional: Math.min(scores.transactional, 1),
-      temporal: Math.min(scores.temporal, 1),
-      network: Math.min(scores.network, 1),
-      confidence
+      overall: Math.min(overall, 1.0),
+      behavioral: Math.min(scores.behavioral, 1.0),
+      transactional: Math.min(scores.transactional, 1.0),
+      temporal: Math.min(scores.temporal, 1.0),
+      network: Math.min(scores.network, 1.0),
+      confidence: Math.min(confidence, 1.0)
     };
   }
 
@@ -623,8 +649,38 @@ export class FraudDetector {
   }
 
   private isSuspiciousRecipient(recipient: string): boolean {
-    // Check against blacklist or risk database
-    return false; // Mock implementation
+    // Enhanced suspicious recipient detection
+    if (!recipient) return false;
+
+    const suspiciousPatterns = [
+      // Known suspicious patterns
+      /^[0-9a-f]{40,}$/i, // Long hex strings (crypto addresses)
+      /temp|test|fake|dummy/i, // Temporary/test accounts
+      /^.{1,2}$/, // Very short names
+      /[0-9]{10,}/, // Long numeric sequences
+    ];
+
+    const highRiskDomains = [
+      'tempmail.org', '10minutemail.com', 'guerrillamail.com',
+      'mailinator.com', 'temp-mail.org'
+    ];
+
+    // Check patterns
+    if (suspiciousPatterns.some(pattern => pattern.test(recipient))) {
+      return true;
+    }
+
+    // Check domains if email
+    if (recipient.includes('@')) {
+      const domain = recipient.split('@')[1];
+      if (highRiskDomains.includes(domain)) {
+        return true;
+      }
+    }
+
+    // Check against internal blacklist (simulate database lookup)
+    const blacklistedRecipients = this.getBlacklistedRecipients();
+    return blacklistedRecipients.includes(recipient.toLowerCase());
   }
 
   private getRecipientRisk(recipient: string): string {
@@ -680,18 +736,68 @@ export class FraudDetector {
   }
 
   private isTorNetwork(ipAddress: string): boolean {
-    // Check against Tor exit node list
-    return false; // Mock implementation
+    if (!ipAddress) return false;
+
+    // Known Tor exit node patterns and ranges
+    const torPatterns = [
+      /^127\.0\.0\.1$/, // Localhost (often used with Tor)
+      /^10\./, // Private network ranges often used with Tor bridges
+      /^192\.168\./, // Private ranges
+    ];
+
+    // Simulate checking against known Tor exit nodes
+    const knownTorNodes = [
+      '185.220.100.240', '185.220.100.241', '185.220.100.242',
+      '185.220.101.1', '185.220.101.2', '185.220.101.3',
+      '199.87.154.255', '199.87.154.254'
+    ];
+
+    return knownTorNodes.includes(ipAddress) ||
+           torPatterns.some(pattern => pattern.test(ipAddress));
   }
 
   private extractFeatures(event: SecurityEvent, context: any): number[] {
-    // Extract numerical features for ML model
+    const date = new Date(event.timestamp);
+    const transaction = context.transaction || {};
+    const network = context.network || {};
+    const device = context.device || {};
+    const location = context.location || {};
+
+    // Enhanced feature engineering for fraud detection
     return [
-      new Date(event.timestamp).getHours(), // Hour of day
-      new Date(event.timestamp).getDay(), // Day of week
-      context.transaction?.amount || 0,
-      context.network?.riskScore || 0,
-      event.details?.sessionDuration || 0
+      // Temporal features
+      date.getHours(), // Hour of day (0-23)
+      date.getDay(), // Day of week (0-6)
+      date.getDate(), // Day of month (1-31)
+      this.isWeekend(date) ? 1 : 0, // Weekend indicator
+      this.isBusinessHours(date) ? 1 : 0, // Business hours indicator
+
+      // Transaction features
+      Math.log(Math.max(transaction.amount || 1, 1)), // Log amount (handles outliers)
+      this.getAmountPercentile(transaction.amount, event.userId), // Amount percentile for user
+      transaction.currency === 'USD' ? 1 : 0, // Currency type
+      this.getTransactionVelocity(event.userId), // Recent transaction velocity
+
+      // Location features
+      this.isHighRiskCountry(location.country) ? 1 : 0, // High-risk country
+      this.getLocationRisk(location.country, location.ip), // Location risk score
+      this.isVpnOrTor(network.ip) ? 1 : 0, // VPN/Tor usage
+      Math.abs(location.timezoneOffset || 0) / 12, // Timezone offset normalized
+
+      // Device features
+      device.isNewDevice ? 1 : 0, // New device indicator
+      device.isMobile ? 1 : 0, // Mobile device
+      this.getDeviceRiskScore(device), // Device fingerprint risk
+
+      // Behavioral features
+      this.getUserRiskScore(event.userId), // Historical user risk
+      event.details?.sessionDuration || 0, // Session duration
+      this.getRecentFailedAttempts(event.userId), // Recent failed attempts
+
+      // Network features
+      network.riskScore || 0, // Network risk score
+      this.isProxyDetected(network.ip) ? 1 : 0, // Proxy detection
+      network.connectionSpeed || 0 // Connection speed anomaly
     ];
   }
 
@@ -717,5 +823,154 @@ export class FraudDetector {
     return Math.sqrt(
       Math.pow(loc1.lat - loc2.lat, 2) + Math.pow(loc1.lng - loc2.lng, 2)
     ) * 111; // Approximate km per degree
+  }
+
+  // Enhanced helper methods for improved fraud detection
+
+  private isWeekend(date: Date): boolean {
+    const day = date.getDay();
+    return day === 0 || day === 6; // Sunday or Saturday
+  }
+
+  private isBusinessHours(date: Date): boolean {
+    const hour = date.getHours();
+    const day = date.getDay();
+    // Monday-Friday 9AM-5PM
+    return day >= 1 && day <= 5 && hour >= 9 && hour <= 17;
+  }
+
+  private getAmountPercentile(amount: number, userId: string): number {
+    // Get user's historical transaction amounts
+    const userTransactions = this.getUserTransactionHistory(userId);
+    if (userTransactions.length === 0) return 0.5; // Default for new users
+
+    const sorted = userTransactions.sort((a, b) => a - b);
+    let rank = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      if (sorted[i] <= amount) rank = i + 1;
+    }
+    return rank / sorted.length;
+  }
+
+  private getTransactionVelocity(userId: string): number {
+    // Calculate transactions per hour in last 24 hours
+    const recentTransactions = this.getRecentTransactions(userId, 24);
+    return recentTransactions.length / 24;
+  }
+
+  private isHighRiskCountry(country: string): boolean {
+    const highRiskCountries = [
+      'AF', 'BY', 'CF', 'CD', 'CU', 'ER', 'GN', 'GW',
+      'HT', 'IR', 'IQ', 'LB', 'LY', 'ML', 'MM', 'NI',
+      'KP', 'RU', 'SO', 'SS', 'SD', 'SY', 'UA', 'VE',
+      'YE', 'ZW', 'PK', 'BD', 'NG' // High-risk countries
+    ];
+    return highRiskCountries.includes(country?.toUpperCase());
+  }
+
+  private getLocationRisk(country: string, ip: string): number {
+    let risk = 0;
+
+    if (this.isHighRiskCountry(country)) risk += 0.4;
+    if (this.isTorNetwork(ip)) risk += 0.3;
+    if (this.isVpnOrTor(ip)) risk += 0.2;
+    if (this.isProxyDetected(ip)) risk += 0.15;
+
+    return Math.min(risk, 1.0);
+  }
+
+  private isVpnOrTor(ip: string): boolean {
+    if (!ip) return false;
+
+    // Enhanced VPN/Tor detection
+    const vpnPatterns = [
+      /^10\./, // Private networks often used by VPNs
+      /^172\.(1[6-9]|2[0-9]|3[01])\./, // Private range 172.16.0.0-172.31.255.255
+      /^192\.168\./, // Private range 192.168.0.0-192.168.255.255
+    ];
+
+    const knownVpnRanges = [
+      '185.220.', // Common VPN provider range
+      '91.219.', // Another VPN range
+      '5.253.',
+    ];
+
+    return this.isTorNetwork(ip) ||
+           vpnPatterns.some(pattern => pattern.test(ip)) ||
+           knownVpnRanges.some(range => ip.startsWith(range));
+  }
+
+  private getDeviceRiskScore(device: any): number {
+    let risk = 0;
+
+    if (device.isJailbroken || device.isRooted) risk += 0.3;
+    if (device.hasEmulator) risk += 0.25;
+    if (device.isSuspiciousUserAgent) risk += 0.2;
+    if (!device.cookiesEnabled) risk += 0.15;
+    if (device.hasAdBlocker) risk += 0.1;
+
+    return Math.min(risk, 1.0);
+  }
+
+  private getUserRiskScore(userId: string): number {
+    // Historical user behavior analysis
+    const userProfile = this.behaviorProfiles.get(userId);
+    if (!userProfile) return 0.1; // New user, low baseline risk
+
+    let risk = 0;
+
+    if (userProfile.failedLoginAttempts > 3) risk += 0.2;
+    if (userProfile.suspiciousActivityCount > 2) risk += 0.3;
+    if (userProfile.accountAge < 30) risk += 0.15; // days
+    if (userProfile.emailVerified === false) risk += 0.2;
+    if (userProfile.phoneVerified === false) risk += 0.15;
+
+    return Math.min(risk, 0.9);
+  }
+
+  private getRecentFailedAttempts(userId: string): number {
+    const userProfile = this.behaviorProfiles.get(userId);
+    return userProfile?.recentFailedAttempts || 0;
+  }
+
+  private isProxyDetected(ip: string): boolean {
+    if (!ip) return false;
+
+    // Enhanced proxy detection
+    const proxyPatterns = [
+      /^8\.8\.[0-9]+\.[0-9]+$/, // Google DNS (sometimes used as proxy)
+      /^1\.1\.[0-9]+\.[0-9]+$/, // Cloudflare DNS
+    ];
+
+    const knownProxyRanges = [
+      '104.16.', // Cloudflare proxy range
+      '172.67.', // Cloudflare proxy range
+      '198.41.', // Known proxy range
+    ];
+
+    return proxyPatterns.some(pattern => pattern.test(ip)) ||
+           knownProxyRanges.some(range => ip.startsWith(range));
+  }
+
+  private getUserTransactionHistory(userId: string): number[] {
+    // Simulate getting user's historical transaction amounts
+    const profile = this.behaviorProfiles.get(userId);
+    return profile?.transactionHistory || [100, 250, 500, 75, 300]; // Default history
+  }
+
+  private getRecentTransactions(userId: string, hours: number): any[] {
+    // Simulate getting recent transactions
+    const profile = this.behaviorProfiles.get(userId);
+    return profile?.recentTransactions || [];
+  }
+
+  private getBlacklistedRecipients(): string[] {
+    // Simulate blacklisted recipients database
+    return [
+      'scammer@example.com',
+      'fraud.wallet.addr',
+      'suspicious.recipient@temp.com',
+      'known.bad.actor'
+    ];
   }
 }
