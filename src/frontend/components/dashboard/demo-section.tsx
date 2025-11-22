@@ -332,7 +332,7 @@ export function DemoSection() {
         addLog(`Retention: ${randomAction.retentionPeriod} days`, 'info')
       } else if (randomAction.action === 'update_consent') {
         addLog(`Consent updated for user: ${randomAction.userId}`, 'success')
-        addLog(`Consent types: ${randomAction.consentTypes.join(', ')}`, 'info')
+        addLog(`Consent types: ${randomAction.consentTypes!.join(', ')}`, 'info')
       } else if (randomAction.action === 'audit_access') {
         addLog(`Access audit logged for resource: ${randomAction.resourceId}`, 'success')
         addLog(`Access level: ${randomAction.accessLevel}`, 'info')
