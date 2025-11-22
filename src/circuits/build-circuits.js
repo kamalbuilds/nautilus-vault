@@ -41,7 +41,8 @@ async function compileCircuit(circuitName, circuitFile) {
   try {
     // Compile circuit to R1CS and WASM
     console.log(`  📝 Compiling ${circuitFile} to R1CS and WASM...`);
-    execSync(`circom ${circuitPath} --r1cs --wasm --sym -o ${outputDir}`, {
+    const projectRoot = path.join(CIRCUITS_DIR, '../..');
+    execSync(`circom ${circuitPath} --r1cs --wasm --sym -l ${projectRoot}/node_modules -o ${outputDir}`, {
       stdio: 'inherit',
       cwd: CIRCUITS_DIR
     });
@@ -66,7 +67,7 @@ async function generateKeys(circuitName) {
     // Download powers of tau file if it doesn't exist
     if (!fs.existsSync(ptauPath)) {
       console.log('  📥 Downloading powers of tau ceremony file...');
-      execSync(`wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_15.ptau -O ${ptauPath}`, {
+      execSync(`curl -L -o ${ptauPath} https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_15.ptau`, {
         stdio: 'inherit'
       });
     }
@@ -91,7 +92,7 @@ async function generateKeys(circuitName) {
 async function validateSetup(circuitName) {
   console.log(`\n🔍 Validating setup for circuit: ${circuitName}`);
 
-  const wasmPath = path.join(COMPILED_DIR, circuitName, `${circuitName}.wasm`);
+  const wasmPath = path.join(COMPILED_DIR, circuitName, `${circuitName}_js`, `${circuitName}.wasm`);
   const zkeyPath = path.join(KEYS_DIR, `${circuitName}.zkey`);
   const vkeyPath = path.join(KEYS_DIR, `${circuitName}_verification_key.json`);
 
@@ -118,7 +119,7 @@ async function validateSetup(circuitName) {
 async function createTestProof(circuitName) {
   console.log(`\n🧪 Creating test proof for circuit: ${circuitName}`);
 
-  const wasmPath = path.join(COMPILED_DIR, circuitName, `${circuitName}.wasm`);
+  const wasmPath = path.join(COMPILED_DIR, circuitName, `${circuitName}_js`, `${circuitName}.wasm`);
   const zkeyPath = path.join(KEYS_DIR, `${circuitName}.zkey`);
 
   try {

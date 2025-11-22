@@ -1,7 +1,7 @@
 pragma circom 2.0.0;
 
-include "node_modules/circomlib/circuits/comparators.circom";
-include "node_modules/circomlib/circuits/mimc.circom";
+include "circomlib/circuits/comparators.circom";
+include "circomlib/circuits/mimc.circom";
 
 // Range proof circuit - proves a value is within a range without revealing the value
 template RangeProof(n) {
@@ -14,13 +14,13 @@ template RangeProof(n) {
     signal output proof;          // Public: proof that value is in range
 
     // Ensure value >= minValue
-    component geq = GreaterEqualThan(n);
+    component geq = GreaterEqThan(n);
     geq.in[0] <== value;
     geq.in[1] <== minValue;
     geq.out === 1;
 
     // Ensure value <= maxValue
-    component leq = LessEqualThan(n);
+    component leq = LessEqThan(n);
     leq.in[0] <== value;
     leq.in[1] <== maxValue;
     leq.out === 1;

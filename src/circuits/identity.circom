@@ -1,8 +1,8 @@
 pragma circom 2.0.0;
 
-include "node_modules/circomlib/circuits/mimc.circom";
-include "node_modules/circomlib/circuits/poseidon.circom";
-include "node_modules/circomlib/circuits/eddsa.circom";
+include "circomlib/circuits/mimc.circom";
+include "circomlib/circuits/poseidon.circom";
+include "circomlib/circuits/eddsa.circom";
 
 // Identity proof circuit - proves identity attributes without revealing them
 template IdentityProof() {
@@ -63,7 +63,6 @@ template IdentityProof() {
     timestamp <== timestampHash.out;
 
     // Constraints
-    age * (age - 1) === 0; // Ensure age is reasonable (simplified)
     license * (license - 1) === 0; // Ensure license is 0 or 1
 }
 

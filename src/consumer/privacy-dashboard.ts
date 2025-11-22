@@ -17,6 +17,12 @@ import { ConsentManager } from '../privacy/consent-manager';
 import { DataMinimizer } from '../privacy/data-minimizer';
 import { EncryptionManager } from '../security/encryption-manager';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return getErrorMessage(error);
+  return String(error);
+}
+
 export interface DashboardData {
   user: UserProfile;
   privacyScore: PrivacyScore;
