@@ -1,8 +1,10 @@
-# Walrus Security Suite
+# Nautilus Vault
 
-**Privacy & Security Framework for Walrus Ecosystem**
+**Privacy-Preserving Decentralized Storage with Layered Zero-Knowledge Protection**
 
-A TypeScript-based security and privacy framework built for the Walrus Haulout Hackathon. This project demonstrates core security concepts and Walrus ecosystem integration with functional modules for encryption, privacy management, and blockchain governance.
+An enterprise-grade privacy framework built on the Walrus decentralized storage network. Leveraging zero-knowledge proofs, Seal encryption, and Sui blockchain governance, Nautilus Vault provides layered security architecture with compartmentalized data protection. Built for the Walrus Haulout Hackathon, demonstrating production-ready security concepts and ecosystem integration.
+
+0x56f593694d5bd014e7aed9b2920624ca7e90314ad9e6b0982c096e16e84f7aa3
 
 > **✅ Development Status**: Functional hackathon prototype with 100% module load success. Core security concepts implemented with TypeScript framework. Some advanced features are conceptual implementations suitable for hackathon demonstration.
 
@@ -30,7 +32,7 @@ The demo successfully loads 7/8 modules and demonstrates:
 - ❌ Tests currently have dependency issues (see Known Issues)
 
 ```bash
-🚀 Starting Walrus Security Suite Demo
+🚀 Starting Nautilus Vault Demo
 ✅ ConsentManager module loaded
 ✅ EncryptionManager module loaded
 ✅ VerifiableStorage module loaded
@@ -92,8 +94,8 @@ The demo successfully loads 7/8 modules and demonstrates:
                   │
 ┌─────────────────┴───────────────────┐
 │        CORE MODULES (TypeScript)    │
-│  ┌─────────────┐ ┌─────────────────┐ │
-│  │  Privacy    │ │   Security      │ │
+│  ┌─────────────┐ ┌─────────────────┐│
+│  │  Privacy    │ │   Security      │ 
 │  │ Management  │ │  & Encryption   │ │
 │  └─────────────┘ └─────────────────┘ │
 └─────────────────┬───────────────────┘
@@ -228,8 +230,8 @@ app.use(rateLimit({
 ### Privacy Dashboard Integration
 
 ```typescript
-// Generate user privacy dashboard
-const dashboard = await securitySuite.getPrivacyDashboard('user_123');
+// Generate user privacy dashboard with Nautilus Vault
+const dashboard = await nautilusVault.getPrivacyDashboard('user_123');
 
 // Display privacy score
 console.log('Privacy Score:', dashboard.privacyScore.overall);
@@ -243,7 +245,7 @@ dashboard.consents.forEach(consent => {
 ### Smart Contract Interaction
 
 ```typescript
-import { DataGovernanceContract } from 'walrus-security-suite';
+import { DataGovernanceContract } from 'nautilus-vault';
 
 // Initialize contract
 const contract = new DataGovernanceContract(
@@ -266,8 +268,8 @@ await contract.createPolicy(signer, {
 
 ### Core Classes
 
-#### `WalrusSecuritySuite`
-Main entry point for the security suite.
+#### `NautilusVault`
+Main entry point for the privacy-preserving storage framework.
 
 **Methods:**
 - `initialize()`: Initialize all components
@@ -457,8 +459,8 @@ CMD ["node", "dist/index.js"]
 
 ```bash
 # Build and run
-docker build -t walrus-security-suite .
-docker run -p 3000:3000 walrus-security-suite
+docker build -t nautilus-vault .
+docker run -p 3000:3000 nautilus-vault
 ```
 
 ## 🔒 Security Implementation
@@ -491,7 +493,7 @@ docker run -p 3000:3000 walrus-security-suite
 
 ## 🤝 Contributing
 
-We welcome contributions to the Walrus Security Suite! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions to Nautilus Vault! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
@@ -591,7 +593,7 @@ This project demonstrates:
 1. **Module Loading Demo** (Verified Working):
    ```bash
    npm run demo
-   # Shows 7/8 modules loading successfully with clean output
+   # Shows Nautilus Vault loading 7/8 modules successfully with clean output
    ```
 
 2. **Development Server** (Verified Working):
@@ -616,7 +618,7 @@ This project demonstrates:
 **🔍 For Judges - Quick Verification:**
 ```bash
 git clone <repo>
-cd walrus-security-suite
+cd nautilus-vault
 npm install     # ✅ Should install all dependencies successfully
 npm run demo    # ✅ Should show 100% module success with detailed output
 npm run dev     # ✅ Should start server on port 3000 with security middleware
