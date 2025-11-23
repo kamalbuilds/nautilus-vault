@@ -6,6 +6,13 @@
 import { SecurityError, PrivacyError } from '../types';
 import { createHash } from 'crypto';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+
 export interface MinimizationConfig {
   purpose: string;
   retention: number; // retention period in milliseconds
@@ -96,7 +103,7 @@ export class DataMinimizer {
       return result;
 
     } catch (error) {
-      throw new PrivacyError(`Data minimization failed: ${error.message}`, 'MINIMIZATION_ERROR');
+      throw new PrivacyError(`Data minimization failed: ${error instanceof Error ? error.message : String(error)}`, 'MINIMIZATION_ERROR');
     }
   }
 
@@ -185,7 +192,7 @@ export class DataMinimizer {
       };
 
     } catch (error) {
-      throw new PrivacyError(`Proportionality assessment failed: ${error.message}`, 'ASSESSMENT_ERROR');
+      throw new PrivacyError(`Proportionality assessment failed: ${error instanceof Error ? error.message : String(error)}`, 'ASSESSMENT_ERROR');
     }
   }
 
@@ -235,7 +242,7 @@ export class DataMinimizer {
       return { retained, deleted, expiringSoon };
 
     } catch (error) {
-      throw new PrivacyError(`Retention policy application failed: ${error.message}`, 'RETENTION_ERROR');
+      throw new PrivacyError(`Retention policy application failed: ${error instanceof Error ? error.message : String(error)}`, 'RETENTION_ERROR');
     }
   }
 

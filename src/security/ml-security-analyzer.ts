@@ -7,6 +7,13 @@ import { MLModel, SecurityError } from '../types';
 import { Matrix } from 'ml-matrix';
 import { MultivariateLinearRegression } from 'ml-regression';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+
 // Production-grade Logistic Regression implementation
 class LogisticRegression {
   public weights: number[];
@@ -110,7 +117,7 @@ export class MLSecurityAnalyzer {
 
       console.log('ML Security Analyzer initialized successfully');
     } catch (error) {
-      console.warn('ML models failed to initialize, using fallback mode:', error.message);
+      console.warn('ML models failed to initialize, using fallback mode:', getErrorMessage(error));
       // Initialize with minimal fallback models
       this.initializeFallbackModels();
     }
@@ -178,7 +185,7 @@ export class MLSecurityAnalyzer {
       };
 
     } catch (error) {
-      throw new SecurityError(`Fraud prediction failed: ${error.message}`, 'PREDICTION_ERROR', 'HIGH');
+      throw new SecurityError(`Fraud prediction failed: ${error instanceof Error ? error.message : String(error)}`, 'PREDICTION_ERROR', 'HIGH');
     }
   }
 
@@ -204,7 +211,7 @@ export class MLSecurityAnalyzer {
       };
 
     } catch (error) {
-      throw new SecurityError(`Anomaly detection failed: ${error.message}`, 'ANOMALY_DETECTION_ERROR', 'HIGH');
+      throw new SecurityError(`Anomaly detection failed: ${error instanceof Error ? error.message : String(error)}`, 'ANOMALY_DETECTION_ERROR', 'HIGH');
     }
   }
 
@@ -224,7 +231,7 @@ export class MLSecurityAnalyzer {
       return clusters;
 
     } catch (error) {
-      throw new SecurityError(`Behavior clustering failed: ${error.message}`, 'CLUSTERING_ERROR', 'HIGH');
+      throw new SecurityError(`Behavior clustering failed: ${error instanceof Error ? error.message : String(error)}`, 'CLUSTERING_ERROR', 'HIGH');
     }
   }
 
@@ -253,7 +260,7 @@ export class MLSecurityAnalyzer {
       console.log('Fraud detection model trained successfully');
 
     } catch (error) {
-      throw new SecurityError(`Model training failed: ${error.message}`, 'TRAINING_ERROR', 'HIGH');
+      throw new SecurityError(`Model training failed: ${error instanceof Error ? error.message : String(error)}`, 'TRAINING_ERROR', 'HIGH');
     }
   }
 
@@ -282,7 +289,7 @@ export class MLSecurityAnalyzer {
       console.log('Anomaly detection model trained successfully');
 
     } catch (error) {
-      throw new SecurityError(`Anomaly model training failed: ${error.message}`, 'ANOMALY_TRAINING_ERROR', 'HIGH');
+      throw new SecurityError(`Anomaly model training failed: ${error instanceof Error ? error.message : String(error)}`, 'ANOMALY_TRAINING_ERROR', 'HIGH');
     }
   }
 
@@ -308,7 +315,7 @@ export class MLSecurityAnalyzer {
       return results;
 
     } catch (error) {
-      throw new SecurityError(`Model evaluation failed: ${error.message}`, 'EVALUATION_ERROR', 'MEDIUM');
+      throw new SecurityError(`Model evaluation failed: ${error instanceof Error ? error.message : String(error)}`, 'EVALUATION_ERROR', 'MEDIUM');
     }
   }
 
@@ -345,7 +352,7 @@ export class MLSecurityAnalyzer {
       console.log(`${modelType} model updated successfully`);
 
     } catch (error) {
-      throw new SecurityError(`Model update failed: ${error.message}`, 'UPDATE_ERROR', 'MEDIUM');
+      throw new SecurityError(`Model update failed: ${error instanceof Error ? error.message : String(error)}`, 'UPDATE_ERROR', 'MEDIUM');
     }
   }
 
@@ -374,7 +381,7 @@ export class MLSecurityAnalyzer {
 
       return null;
     } catch (error) {
-      throw new SecurityError(`Model export failed: ${error.message}`, 'EXPORT_ERROR', 'MEDIUM');
+      throw new SecurityError(`Model export failed: ${error instanceof Error ? error.message : String(error)}`, 'EXPORT_ERROR', 'MEDIUM');
     }
   }
 
@@ -403,7 +410,7 @@ export class MLSecurityAnalyzer {
       console.log(`${modelType} model imported successfully`);
 
     } catch (error) {
-      throw new SecurityError(`Model import failed: ${error.message}`, 'IMPORT_ERROR', 'MEDIUM');
+      throw new SecurityError(`Model import failed: ${error instanceof Error ? error.message : String(error)}`, 'IMPORT_ERROR', 'MEDIUM');
     }
   }
 

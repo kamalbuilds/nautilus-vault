@@ -61,7 +61,7 @@ export function DemoSection() {
     {
       timestamp: new Date().toLocaleTimeString(),
       type: 'info',
-      message: 'Walrus Security Suite Ready. Advanced testing interface loaded.'
+      message: 'Nautilus Vault Ready. Advanced testing interface loaded.'
     }
   ])
   const [loading, setLoading] = useState<string | null>(null)

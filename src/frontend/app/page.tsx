@@ -87,7 +87,7 @@ export default function LandingPage() {
             🏆 Hackathon-Ready Production Suite
           </Badge>
           <h1 className="text-5xl font-bold text-slate-900 mb-6">
-            Walrus Security Suite
+            Nautilus Vault
           </h1>
           <p className="text-xl text-slate-600 mb-4 max-w-3xl mx-auto">
             Enterprise-grade security, privacy, and compliance platform built on the Walrus ecosystem.
@@ -330,7 +330,7 @@ export default function LandingPage() {
       <footer className="py-8 px-4 bg-slate-800 text-slate-400 text-center">
         <div className="max-w-6xl mx-auto">
           <p className="text-sm">
-            Walrus Security Suite - Enterprise Data Security & Privacy Platform
+            Nautilus Vault - Enterprise Data Security & Privacy Platform
           </p>
           <p className="text-xs mt-2">
             Built with TypeScript • Next.js • Sui Move • Production ML Models

@@ -6,6 +6,13 @@
 import { ConsentRecord, DataSubject, PrivacyPreferences, SecurityError, PrivacyError } from '../types';
 import { createHash, randomBytes } from 'crypto';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+
 export interface ConsentRequest {
   id: string;
   dataSubjectId: string;
@@ -199,7 +206,8 @@ export class ConsentManager {
       return request;
 
     } catch (error) {
-      throw new PrivacyError(`Failed to create consent request: ${error.message}`, 'CONSENT_REQUEST_ERROR');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PrivacyError(`Failed to create consent request: ${message}`, 'CONSENT_REQUEST_ERROR');
     }
   }
 
@@ -273,7 +281,8 @@ export class ConsentManager {
       return response;
 
     } catch (error) {
-      throw new PrivacyError(`Failed to process consent response: ${error.message}`, 'CONSENT_RESPONSE_ERROR');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PrivacyError(`Failed to process consent response: ${message}`, 'CONSENT_RESPONSE_ERROR');
     }
   }
 
@@ -300,7 +309,8 @@ export class ConsentManager {
              !purposeStatus.withdrawnAt;
 
     } catch (error) {
-      console.error(`Error checking consent validity: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`Error checking consent validity: ${message}`);
       return false;
     }
   }
@@ -349,7 +359,8 @@ export class ConsentManager {
       console.log(`Withdrew consent for purposes ${purposeIds.join(', ')} for subject ${dataSubjectId}`);
 
     } catch (error) {
-      throw new PrivacyError(`Failed to withdraw consent: ${error.message}`, 'CONSENT_WITHDRAWAL_ERROR');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PrivacyError(`Failed to withdraw consent: ${message}`, 'CONSENT_WITHDRAWAL_ERROR');
     }
   }
 
@@ -431,7 +442,8 @@ export class ConsentManager {
       };
 
     } catch (error) {
-      throw new PrivacyError(`Failed to get consent status: ${error.message}`, 'STATUS_ERROR');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PrivacyError(`Failed to get consent status: ${message}`, 'STATUS_ERROR');
     }
   }
 
@@ -475,7 +487,8 @@ export class ConsentManager {
       return renewalRequest;
 
     } catch (error) {
-      throw new PrivacyError(`Failed to renew consent: ${error.message}`, 'CONSENT_RENEWAL_ERROR');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PrivacyError(`Failed to renew consent: ${message}`, 'CONSENT_RENEWAL_ERROR');
     }
   }
 
@@ -548,7 +561,8 @@ export class ConsentManager {
       };
 
     } catch (error) {
-      throw new PrivacyError(`Failed to generate consent dashboard: ${error.message}`, 'DASHBOARD_ERROR');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PrivacyError(`Failed to generate consent dashboard: ${message}`, 'DASHBOARD_ERROR');
     }
   }
 
@@ -643,7 +657,8 @@ export class ConsentManager {
         }
       }
     } catch (error) {
-      console.error(`Error checking expiring consents: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`Error checking expiring consents: ${message}`);
     }
   }
 

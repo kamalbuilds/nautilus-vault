@@ -4,6 +4,12 @@
  */
 
 import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
+
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
 import { bcs } from '@mysten/sui.js/bcs';
@@ -477,7 +483,7 @@ export class RealSuiBlockchainService {
       return {
         verified: false,
         onChain: false,
-        details: { error: error.message }
+        details: { error: getErrorMessage(error) }
       };
     }
   }

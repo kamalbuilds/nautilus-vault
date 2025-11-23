@@ -7,6 +7,13 @@ import { EncryptionKey, EncryptedData, SecurityError } from '../types';
 import { createCipheriv, createDecipheriv, createHash, randomBytes, pbkdf2Sync, scryptSync } from 'crypto';
 import * as forge from 'node-forge';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+
 export interface EncryptionConfig {
   algorithm: 'AES-256-GCM' | 'AES-256-CBC' | 'ChaCha20-Poly1305';
   keyDerivation: 'PBKDF2' | 'Argon2' | 'HKDF' | 'scrypt';
@@ -115,7 +122,7 @@ export class EncryptionManager {
 
     } catch (error) {
       this.metrics.failedOperations++;
-      throw new SecurityError(`Encryption failed: ${error.message}`, 'ENCRYPTION_ERROR', 'HIGH');
+      throw new SecurityError(`Encryption failed: ${error instanceof Error ? error.message : String(error)}`, 'ENCRYPTION_ERROR', 'HIGH');
     }
   }
 
@@ -158,7 +165,7 @@ export class EncryptionManager {
 
     } catch (error) {
       this.metrics.failedOperations++;
-      throw new SecurityError(`Decryption failed: ${error.message}`, 'DECRYPTION_ERROR', 'HIGH');
+      throw new SecurityError(`Decryption failed: ${error instanceof Error ? error.message : String(error)}`, 'DECRYPTION_ERROR', 'HIGH');
     }
   }
 
@@ -198,7 +205,7 @@ export class EncryptionManager {
       return key;
 
     } catch (error) {
-      throw new SecurityError(`Key generation failed: ${error.message}`, 'KEY_GENERATION_ERROR', 'HIGH');
+      throw new SecurityError(`Key generation failed: ${error instanceof Error ? error.message : String(error)}`, 'KEY_GENERATION_ERROR', 'HIGH');
     }
   }
 
@@ -240,7 +247,7 @@ export class EncryptionManager {
       return newKeyIds;
 
     } catch (error) {
-      throw new SecurityError(`Key rotation failed: ${error.message}`, 'KEY_ROTATION_ERROR', 'HIGH');
+      throw new SecurityError(`Key rotation failed: ${error instanceof Error ? error.message : String(error)}`, 'KEY_ROTATION_ERROR', 'HIGH');
     }
   }
 
@@ -293,7 +300,7 @@ export class EncryptionManager {
       return keyString;
 
     } catch (error) {
-      throw new SecurityError(`Key derivation failed: ${error.message}`, 'KEY_DERIVATION_ERROR', 'HIGH');
+      throw new SecurityError(`Key derivation failed: ${error instanceof Error ? error.message : String(error)}`, 'KEY_DERIVATION_ERROR', 'HIGH');
     }
   }
 
@@ -315,7 +322,7 @@ export class EncryptionManager {
       return sharedSecret;
 
     } catch (error) {
-      throw new SecurityError(`Key exchange failed: ${error.message}`, 'KEY_EXCHANGE_ERROR', 'HIGH');
+      throw new SecurityError(`Key exchange failed: ${error instanceof Error ? error.message : String(error)}`, 'KEY_EXCHANGE_ERROR', 'HIGH');
     }
   }
 
@@ -366,7 +373,7 @@ export class EncryptionManager {
       console.log(`Key ${keyId} revoked for user ${userId}`);
 
     } catch (error) {
-      throw new SecurityError(`Key revocation failed: ${error.message}`, 'KEY_REVOCATION_ERROR', 'HIGH');
+      throw new SecurityError(`Key revocation failed: ${error instanceof Error ? error.message : String(error)}`, 'KEY_REVOCATION_ERROR', 'HIGH');
     }
   }
 
@@ -410,7 +417,7 @@ export class EncryptionManager {
       return cleanedCount;
 
     } catch (error) {
-      console.error(`Key cleanup failed: ${error.message}`);
+      console.error(`Key cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
       return 0;
     }
   }
@@ -425,7 +432,7 @@ export class EncryptionManager {
         await this.performScheduledRotation();
         await this.cleanupExpiredKeys();
       } catch (error) {
-        console.error(`Scheduled key rotation failed: ${error.message}`);
+        console.error(`Scheduled key rotation failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }, this.rotationPolicy.rotationIntervalMs);
   }

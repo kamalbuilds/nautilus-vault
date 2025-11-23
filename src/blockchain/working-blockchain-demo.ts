@@ -4,6 +4,12 @@
  */
 
 import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
+
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
 
@@ -97,14 +103,14 @@ class WorkingBlockchainDemo {
       throw new Error('Registry creation failed');
 
     } catch (error) {
-      console.log(`❌ Registry creation failed: ${error.message}`);
+      console.log(`❌ Registry creation failed: ${getErrorMessage(error)}`);
 
       // Record as mock transaction for proof of attempt
       const mockDigest = this.generateMockDigest();
       this.recordTransaction({
         digest: mockDigest,
         type: 'REGISTRY_INITIALIZATION_ATTEMPT',
-        data: { error: error.message },
+        data: { error: getErrorMessage(error) },
         gasUsed: 50000
       });
 
@@ -150,7 +156,7 @@ class WorkingBlockchainDemo {
       return transaction;
 
     } catch (error) {
-      console.log(`❌ Simple transaction failed: ${error.message}`);
+      console.log(`❌ Simple transaction failed: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -185,11 +191,11 @@ class WorkingBlockchainDemo {
       };
 
     } catch (error) {
-      console.log(`   ❌ Verification failed: ${error.message}`);
+      console.log(`   ❌ Verification failed: ${getErrorMessage(error)}`);
       return {
         verified: false,
         onChain: false,
-        error: error.message
+        error: getErrorMessage(error)
       };
     }
   }
@@ -201,7 +207,7 @@ class WorkingBlockchainDemo {
       });
       return parseInt(balance.totalBalance);
     } catch (error) {
-      console.log(`❌ Failed to get balance: ${error.message}`);
+      console.log(`❌ Failed to get balance: ${getErrorMessage(error)}`);
       return 0;
     }
   }
@@ -336,7 +342,7 @@ async function main() {
     await demo.runCompleteDemo();
     console.log('\n✅ All demonstrations completed successfully');
   } catch (error) {
-    console.error('\n❌ Demo failed:', error.message);
+    console.error('\n❌ Demo failed:', getErrorMessage(error));
     process.exit(1);
   }
 }

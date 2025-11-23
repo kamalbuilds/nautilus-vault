@@ -5,6 +5,12 @@
 
 import { RealSuiBlockchainService, PrivacyPreferences } from './real-sui-blockchain-service';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
 async function runBlockchainDemo() {
   console.log('🎬 Starting Real Sui Blockchain Demo');
   console.log('=====================================');
@@ -144,7 +150,7 @@ async function runBlockchainDemo() {
           console.log(`   ❌ FAILED - Transaction not found on blockchain`);
         }
       } catch (error) {
-        console.log(`   ⚠️ VERIFICATION ERROR: ${error.message}`);
+        console.log(`   ⚠️ VERIFICATION ERROR: ${getErrorMessage(error)}`);
       }
     }
 

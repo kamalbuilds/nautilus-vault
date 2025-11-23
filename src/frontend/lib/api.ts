@@ -159,6 +159,75 @@ class ApiClient {
       body: JSON.stringify({ dataSubjectId, purposes }),
     })
   }
+
+  // ZK Proof endpoints
+  async generateZKProof(circuitName: string, inputs: any): Promise<any> {
+    return this.request('/api/zk/generate', {
+      method: 'POST',
+      body: JSON.stringify({ circuitName, inputs }),
+    })
+  }
+
+  async verifyZKProof(proof: any, publicSignals: any, circuitName: string): Promise<any> {
+    return this.request('/api/zk/verify', {
+      method: 'POST',
+      body: JSON.stringify({ proof, publicSignals, circuitName }),
+    })
+  }
+
+  async getZKCircuits(): Promise<any> {
+    return this.request('/api/zk/circuits')
+  }
+
+  // Walrus Storage endpoints
+  async storeData(data: any, encrypted?: boolean): Promise<any> {
+    return this.request('/api/walrus/store', {
+      method: 'POST',
+      body: JSON.stringify({ data, encrypted }),
+    })
+  }
+
+  async retrieveData(blobId: string): Promise<any> {
+    return this.request('/api/walrus/retrieve', {
+      method: 'POST',
+      body: JSON.stringify({ blobId }),
+    })
+  }
+
+  async listStoredBlobs(): Promise<any> {
+    return this.request('/api/walrus/list')
+  }
+
+  // Consent Management endpoints
+  async getConsents(dataSubjectId: string): Promise<any> {
+    return this.request(`/api/consent/${dataSubjectId}`)
+  }
+
+  async revokeConsent(requestId: string): Promise<any> {
+    return this.request('/api/consent/revoke', {
+      method: 'POST',
+      body: JSON.stringify({ requestId }),
+    })
+  }
+
+  async getConsentHistory(dataSubjectId: string): Promise<any> {
+    return this.request(`/api/consent/history/${dataSubjectId}`)
+  }
+
+  // Privacy endpoints
+  async calculatePrivacyScore(data: any): Promise<any> {
+    return this.request('/api/privacy/score', {
+      method: 'POST',
+      body: JSON.stringify({ data }),
+    })
+  }
+
+  async requestDataPortability(dataSubjectId: string): Promise<any> {
+    return this.request('/api/privacy/export', {
+      method: 'POST',
+      body: JSON.stringify({ dataSubjectId }),
+    })
+  }
 }
 
 export const api = new ApiClient()

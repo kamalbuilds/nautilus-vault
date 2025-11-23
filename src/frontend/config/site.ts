@@ -1,18 +1,46 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "Next.js",
+  name: "Nautilus Vault",
   description:
-    "Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.",
+    "Enterprise-grade security, privacy, and compliance platform built on the Walrus ecosystem.",
   mainNav: [
     {
       title: "Home",
       href: "/",
     },
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+    },
+    {
+      title: "ZK Proofs",
+      href: "/zk-proofs",
+    },
+    {
+      title: "Storage",
+      href: "/storage",
+    },
+    {
+      title: "Fraud Detection",
+      href: "/fraud",
+    },
+    {
+      title: "Privacy",
+      href: "/privacy",
+    },
+    {
+      title: "Consent",
+      href: "/consent",
+    },
+    {
+      title: "Demo",
+      href: "/demo",
+    },
   ],
   links: {
-    twitter: "https://twitter.com/shadcn",
-    github: "https://github.com/shadcn/ui",
-    docs: "https://ui.shadcn.com",
+    twitter: "https://twitter.com/walrus",
+    github: "https://github.com/walrus-security-suite",
+    docs: "https://walrus.security/docs",
   },
 }

@@ -1,6 +1,6 @@
 /**
  * Real Sui Blockchain Transaction Generator
- * Production-grade blockchain integration for Walrus Security Suite
+ * Production-grade blockchain integration for Nautilus Vault
  * Generates actual transactions on Sui network for hackathon demonstration
  */
 
@@ -67,14 +67,14 @@ export class SuiTransactionGenerator {
       ? Ed25519Keypair.fromSecretKey(fromB64(privateKey))
       : new Ed25519Keypair();
 
-    // Real deployed package ID on Sui testnet
-    this.packageId = '0xcce2c18c0d643fb54e07878c06f76d923877ee4223af485783127c7a64b671c0';
+    // Real deployed package ID on Sui testnet (Data Governance Contract)
+    this.packageId = '0x56f593694d5bd014e7aed9b2920624ca7e90314ad9e6b0982c096e16e84f7aa3';
 
-    // Mock registry object IDs
-    this.dataGovernanceRegistry = '0x1234567890abcdef1234567890abcdef12345678';
-    this.fraudReportRegistry = '0x2345678901bcdef12345678901bcdef123456789';
-    this.auditLogRegistry = '0x3456789012cdef123456789012cdef1234567890';
-    this.zkProofRegistry = '0x4567890123def1234567890123def12345678901';
+    // Registry object IDs (will be created when calling create_registry)
+    this.dataGovernanceRegistry = '0x56f593694d5bd014e7aed9b2920624ca7e90314ad9e6b0982c096e16e84f7aa3';
+    this.fraudReportRegistry = '0x56f593694d5bd014e7aed9b2920624ca7e90314ad9e6b0982c096e16e84f7aa3';
+    this.auditLogRegistry = '0x56f593694d5bd014e7aed9b2920624ca7e90314ad9e6b0982c096e16e84f7aa3';
+    this.zkProofRegistry = '0x56f593694d5bd014e7aed9b2920624ca7e90314ad9e6b0982c096e16e84f7aa3';
 
     console.log(`Sui Transaction Generator initialized on ${network}`);
     console.log(`Wallet Address: ${this.keypair.getPublicKey().toSuiAddress()}`);

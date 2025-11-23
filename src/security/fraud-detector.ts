@@ -7,6 +7,13 @@ import { FraudIndicator, MLModel, SecurityError, SecurityEvent } from '../types'
 import { MLSecurityAnalyzer } from './ml-security-analyzer';
 import { createHash } from 'crypto';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+
 export interface FraudPattern {
   id: string;
   name: string;
@@ -102,7 +109,7 @@ export class FraudDetector {
       return result;
 
     } catch (error) {
-      throw new SecurityError(`Fraud detection failed: ${error.message}`, 'FRAUD_DETECTION_ERROR', 'HIGH');
+      throw new SecurityError(`Fraud detection failed: ${error instanceof Error ? error.message : String(error)}`, 'FRAUD_DETECTION_ERROR', 'HIGH');
     }
   }
 

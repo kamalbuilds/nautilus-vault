@@ -5,6 +5,12 @@
 
 import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
 // Real deployment data from successful transaction
 const DEPLOYMENT_DATA = {
   packageId: '0xcce2c18c0d643fb54e07878c06f76d923877ee4223af485783127c7a64b671c0',
@@ -63,11 +69,11 @@ class BlockchainVerification {
       throw new Error('Package not found on chain');
 
     } catch (error) {
-      console.log('❌ Contract verification failed:', error.message);
+      console.log('❌ Contract verification failed:', getErrorMessage(error));
       return {
         verified: false,
         onChain: false,
-        details: { error: error.message },
+        details: { error: getErrorMessage(error) },
         timestamp: new Date().toISOString()
       };
     }
@@ -115,11 +121,11 @@ class BlockchainVerification {
       throw new Error('Transaction failed or not found');
 
     } catch (error) {
-      console.log('❌ Transaction verification failed:', error.message);
+      console.log('❌ Transaction verification failed:', getErrorMessage(error));
       return {
         verified: false,
         onChain: false,
-        details: { error: error.message },
+        details: { error: getErrorMessage(error) },
         timestamp: new Date().toISOString()
       };
     }
@@ -172,7 +178,7 @@ class BlockchainVerification {
       throw new Error('Could not inspect contract functions');
 
     } catch (error) {
-      console.log('❌ Function verification failed:', error.message);
+      console.log('❌ Function verification failed:', getErrorMessage(error));
 
       // Still return success since we know the functions exist from deployment
       return {
@@ -211,11 +217,11 @@ class BlockchainVerification {
       };
 
     } catch (error) {
-      console.log('❌ Network connectivity failed:', error.message);
+      console.log('❌ Network connectivity failed:', getErrorMessage(error));
       return {
         verified: false,
         onChain: false,
-        details: { error: error.message },
+        details: { error: getErrorMessage(error) },
         timestamp: new Date().toISOString()
       };
     }

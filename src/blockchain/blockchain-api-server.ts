@@ -9,6 +9,12 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { RealSuiBlockchainService, PrivacyPreferences, BlockchainTransaction } from './real-sui-blockchain-service';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
 const app = express();
 
 // Security middleware
@@ -75,7 +81,7 @@ app.post('/api/blockchain/initialize-registry', asyncHandler(async (req: any, re
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'REGISTRY_INIT_FAILED'
     });
   }
@@ -110,7 +116,7 @@ app.post('/api/blockchain/register-data-subject', asyncHandler(async (req: any, 
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'SUBJECT_REGISTRATION_FAILED'
     });
   }
@@ -151,7 +157,7 @@ app.post('/api/blockchain/grant-consent', asyncHandler(async (req: any, res: any
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'CONSENT_GRANT_FAILED'
     });
   }
@@ -186,7 +192,7 @@ app.post('/api/blockchain/withdraw-consent', asyncHandler(async (req: any, res: 
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'CONSENT_WITHDRAW_FAILED'
     });
   }
@@ -221,7 +227,7 @@ app.post('/api/blockchain/right-to-be-forgotten', asyncHandler(async (req: any, 
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'ERASURE_REQUEST_FAILED'
     });
   }
@@ -264,7 +270,7 @@ app.post('/api/blockchain/generate-compliance-report', asyncHandler(async (req: 
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'REPORT_GENERATION_FAILED'
     });
   }
@@ -310,7 +316,7 @@ app.get('/api/blockchain/transaction/:digest', asyncHandler(async (req: any, res
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'TRANSACTION_LOOKUP_FAILED'
     });
   }
@@ -369,7 +375,7 @@ app.post('/api/blockchain/demo-workflow', asyncHandler(async (req: any, res: any
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'WORKFLOW_DEMO_FAILED'
     });
   }
@@ -411,7 +417,7 @@ app.get('/api/blockchain/verify/:digest', asyncHandler(async (req: any, res: any
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
       code: 'VERIFICATION_FAILED'
     });
   }
@@ -433,7 +439,7 @@ app.use((error: any, req: any, res: any, next: any) => {
 
   res.status(error.status || 500).json({
     success: false,
-    error: error.message || 'Internal server error',
+    error: getErrorMessage(error) || 'Internal server error',
     code: error.code || 'INTERNAL_ERROR',
     ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
   });

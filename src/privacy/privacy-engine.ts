@@ -17,6 +17,12 @@ import { AnonymizationEngine } from './anonymization-engine';
 import { ZKProofSystem } from './zk-proof-system';
 import { createHash, randomBytes } from 'crypto';
 
+// Helper function to extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
 export interface ProcessingContext {
   purpose: string;
   legalBasis: 'CONSENT' | 'CONTRACT' | 'LEGAL_OBLIGATION' | 'VITAL_INTERESTS' | 'PUBLIC_TASK' | 'LEGITIMATE_INTERESTS';
@@ -152,7 +158,7 @@ export class PrivacyEngine {
       };
 
     } catch (error) {
-      throw new PrivacyError(`Privacy processing failed: ${error.message}`, 'PROCESSING_ERROR');
+      throw new PrivacyError(`Privacy processing failed: ${error instanceof Error ? error.message : String(error)}`, 'PROCESSING_ERROR');
     }
   }
 
@@ -197,7 +203,7 @@ export class PrivacyEngine {
       return results.every(result => result);
 
     } catch (error) {
-      throw new PrivacyError(`Compliance verification failed: ${error.message}`, 'COMPLIANCE_ERROR');
+      throw new PrivacyError(`Compliance verification failed: ${error instanceof Error ? error.message : String(error)}`, 'COMPLIANCE_ERROR');
     }
   }
 
@@ -226,7 +232,7 @@ export class PrivacyEngine {
       return pia;
 
     } catch (error) {
-      throw new PrivacyError(`PIA generation failed: ${error.message}`, 'PIA_ERROR');
+      throw new PrivacyError(`PIA generation failed: ${error instanceof Error ? error.message : String(error)}`, 'PIA_ERROR');
     }
   }
 
@@ -259,7 +265,7 @@ export class PrivacyEngine {
       console.log(`Data erasure completed for subject: ${dataSubjectId}`);
 
     } catch (error) {
-      throw new PrivacyError(`Right to be forgotten failed: ${error.message}`, 'ERASURE_ERROR');
+      throw new PrivacyError(`Right to be forgotten failed: ${error instanceof Error ? error.message : String(error)}`, 'ERASURE_ERROR');
     }
   }
 
@@ -296,7 +302,7 @@ export class PrivacyEngine {
       };
 
     } catch (error) {
-      throw new PrivacyError(`Data export failed: ${error.message}`, 'EXPORT_ERROR');
+      throw new PrivacyError(`Data export failed: ${error instanceof Error ? error.message : String(error)}`, 'EXPORT_ERROR');
     }
   }
 

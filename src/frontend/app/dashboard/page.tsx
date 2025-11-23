@@ -14,7 +14,7 @@ export default function DashboardPage() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">
-            Walrus Security Suite
+            Nautilus Vault
           </h2>
           <Badge variant="outline" className="px-3 py-1">
             <Activity className="mr-2 h-4 w-4" />
